@@ -16,15 +16,21 @@ export default function Login({ onLogin }: LoginProps) {
     setError('');
     setIsLoading(true);
 
-    // Demo login - in production, this would call an API
+    // Demo login with role-based access
     setTimeout(() => {
-      if (email === 'admin@libertypay.ma' && password === 'admin123') {
+      let user = null;
+      
+      if (email === 'maker@libertypay.ma' && password === 'admin123') {
+        user = { email, name: 'Operations Maker', role: 'maker' };
+      } else if (email === 'checker@libertypay.ma' && password === 'admin123') {
+        user = { email, name: 'Admin Checker', role: 'checker' };
+      } else if (email === 'support@libertypay.ma' && password === 'admin123') {
+        user = { email, name: 'Support Agent', role: 'support' };
+      }
+      
+      if (user) {
         localStorage.setItem('admin_token', 'demo-token-' + Date.now());
-        localStorage.setItem('admin_user', JSON.stringify({
-          email,
-          name: 'Admin User',
-          role: 'super_admin'
-        }));
+        localStorage.setItem('admin_user', JSON.stringify(user));
         onLogin();
       } else {
         setError('Invalid email or password');
@@ -98,9 +104,10 @@ export default function Login({ onLogin }: LoginProps) {
 
         {/* Demo credentials */}
         <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <p className="text-xs text-gray-600 font-semibold mb-2">Demo Credentials:</p>
-          <p className="text-xs text-gray-600">Email: admin@libertypay.ma</p>
-          <p className="text-xs text-gray-600">Password: admin123</p>
+          <p className="text-xs text-gray-600 font-semibold mb-2">Demo Credentials (Password: admin123):</p>
+          <p className="text-xs text-gray-600">Maker: maker@libertypay.ma</p>
+          <p className="text-xs text-gray-600">Checker: checker@libertypay.ma</p>
+          <p className="text-xs text-gray-600">Support: support@libertypay.ma</p>
         </div>
       </div>
     </div>
