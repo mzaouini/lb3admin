@@ -22,7 +22,7 @@ function AppContent() {
   }
 
   if (!isAuthenticated) {
-    return <Login onLogin={() => window.location.reload()} />;
+    return <Login />;
   }
 
   return (
