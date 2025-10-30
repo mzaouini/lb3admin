@@ -71,3 +71,13 @@
 - [x] Update card management access for Maker role
 - [x] Restrict Checker to approval actions only
 - [x] Test all three roles with correct permissions
+
+
+## Card Design Update
+- [x] Update card visual to match NAPS/LibertyPay teal gradient style
+- [x] Add NAPS logo (orange text)
+- [x] Add LibertyPay branding with 3 orange lines
+- [x] Add curved wave pattern background
+- [x] Add chip icon (yellow/gold)
+- [x] Add Mastercard logo (red/orange circles)
+- [x] Match exact color scheme from reference

@@ -284,13 +284,50 @@ export default function CardManagement() {
         {filteredCards.map((card) => (
           <div key={card.id} className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
             {/* Card Visual */}
-            <div className="bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 p-6 text-white relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-              <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12"></div>
+            <div className="bg-gradient-to-br from-[#00C48C] via-[#00D9A3] to-[#00E5B8] p-6 text-white relative overflow-hidden rounded-t-2xl">
+              {/* Curved wave pattern */}
+              <div className="absolute top-0 right-0 w-full h-full opacity-20">
+                <svg viewBox="0 0 400 250" className="w-full h-full">
+                  <path d="M0,100 Q100,50 200,100 T400,100 L400,0 L0,0 Z" fill="white" opacity="0.3"/>
+                  <path d="M0,140 Q100,90 200,140 T400,140 L400,0 L0,0 Z" fill="white" opacity="0.2"/>
+                  <path d="M0,180 Q100,130 200,180 T400,180 L400,0 L0,0 Z" fill="white" opacity="0.1"/>
+                </svg>
+              </div>
               
               <div className="relative z-10">
-                <div className="flex items-center justify-between mb-8">
-                  <CreditCard size={32} />
+                <div className="flex items-center justify-between mb-6">
+                  {/* NAPS logo and LibertyPay branding */}
+                  <div className="flex items-center gap-3">
+                    <span className="text-[#FF9800] font-bold text-xl">naps</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex flex-col gap-0.5">
+                      <div className="w-8 h-1 bg-[#FF9800] rounded"></div>
+                      <div className="w-8 h-1 bg-[#FF9800] rounded"></div>
+                      <div className="w-8 h-1 bg-[#FF9800] rounded"></div>
+                    </div>
+                    <span className="font-bold text-lg">LibertyPay</span>
+                  </div>
+                </div>
+                
+                {/* Chip icon */}
+                <div className="mb-8">
+                  <div className="w-12 h-9 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-md flex items-center justify-center">
+                    <div className="grid grid-cols-3 gap-0.5">
+                      <div className="w-1 h-1 bg-yellow-800 rounded-full"></div>
+                      <div className="w-1 h-1 bg-yellow-800 rounded-full"></div>
+                      <div className="w-1 h-1 bg-yellow-800 rounded-full"></div>
+                      <div className="w-1 h-1 bg-yellow-800 rounded-full"></div>
+                      <div className="w-1 h-1 bg-yellow-800 rounded-full"></div>
+                      <div className="w-1 h-1 bg-yellow-800 rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between mb-2">
+                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                    <CreditCard size={16} />
+                  </div>
                   <div className="flex items-center gap-2">
                     {getStatusIcon(card.status)}
                     <span className={`px-2 py-1 text-xs font-semibold rounded ${getStatusColor(card.status)}`}>
@@ -306,13 +343,20 @@ export default function CardManagement() {
                   
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs text-white/70">Cardholder</p>
-                      <p className="font-semibold">{card.cardHolderName}</p>
+                      <p className="text-xs text-white/80 mb-1">© Client - {card.userId.toString().padStart(9, '0')}</p>
+                      <p className="font-bold text-base uppercase">{card.cardHolderName}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-white/70">Expires</p>
-                      <p className="font-semibold">{card.expiryDate}</p>
+                      {/* Mastercard logo */}
+                      <div className="flex items-center gap-0.5">
+                        <div className="w-8 h-8 bg-[#EB001B] rounded-full opacity-90"></div>
+                        <div className="w-8 h-8 bg-[#FF9800] rounded-full opacity-90 -ml-4"></div>
+                      </div>
                     </div>
+                  </div>
+                  <div className="text-right mt-2">
+                    <p className="text-xs text-white/70">Expires</p>
+                    <p className="font-semibold">{card.expiryDate}</p>
                   </div>
                 </div>
               </div>
@@ -495,22 +539,63 @@ export default function CardManagement() {
 
             <div className="space-y-6">
               {/* Card Visual */}
-              <div className="bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 p-6 text-white rounded-lg relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+              <div className="bg-gradient-to-br from-[#00C48C] via-[#00D9A3] to-[#00E5B8] p-6 text-white rounded-2xl relative overflow-hidden">
+                {/* Curved wave pattern */}
+                <div className="absolute top-0 right-0 w-full h-full opacity-20">
+                  <svg viewBox="0 0 400 250" className="w-full h-full">
+                    <path d="M0,100 Q100,50 200,100 T400,100 L400,0 L0,0 Z" fill="white" opacity="0.3"/>
+                    <path d="M0,140 Q100,90 200,140 T400,140 L400,0 L0,0 Z" fill="white" opacity="0.2"/>
+                    <path d="M0,180 Q100,130 200,180 T400,180 L400,0 L0,0 Z" fill="white" opacity="0.1"/>
+                  </svg>
+                </div>
                 <div className="relative z-10 space-y-4">
                   <div className="flex items-center justify-between">
-                    <CreditCard size={32} />
-                    <span className={`px-3 py-1 text-xs font-semibold rounded ${getStatusColor(selectedCard.status)}`}>
-                      {selectedCard.status.toUpperCase()}
-                    </span>
+                    {/* NAPS logo and LibertyPay branding */}
+                    <div className="flex items-center gap-3">
+                      <span className="text-[#FF9800] font-bold text-xl">naps</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex flex-col gap-0.5">
+                        <div className="w-8 h-1 bg-[#FF9800] rounded"></div>
+                        <div className="w-8 h-1 bg-[#FF9800] rounded"></div>
+                        <div className="w-8 h-1 bg-[#FF9800] rounded"></div>
+                      </div>
+                      <span className="font-bold text-lg">LibertyPay</span>
+                    </div>
                   </div>
+                  
+                  {/* Chip icon */}
+                  <div className="mb-4">
+                    <div className="w-12 h-9 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-md flex items-center justify-center">
+                      <div className="grid grid-cols-3 gap-0.5">
+                        <div className="w-1 h-1 bg-yellow-800 rounded-full"></div>
+                        <div className="w-1 h-1 bg-yellow-800 rounded-full"></div>
+                        <div className="w-1 h-1 bg-yellow-800 rounded-full"></div>
+                        <div className="w-1 h-1 bg-yellow-800 rounded-full"></div>
+                        <div className="w-1 h-1 bg-yellow-800 rounded-full"></div>
+                        <div className="w-1 h-1 bg-yellow-800 rounded-full"></div>
+                      </div>
+                    </div>
+                  </div>
+                  
                   <div className="font-mono text-xl tracking-wider">{selectedCard.cardNumber}</div>
+                  
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs text-white/70">Cardholder</p>
-                      <p className="font-semibold">{selectedCard.cardHolderName}</p>
+                      <p className="text-xs text-white/80 mb-1">© Client - {selectedCard.userId.toString().padStart(9, '0')}</p>
+                      <p className="font-bold text-base uppercase">{selectedCard.cardHolderName}</p>
                     </div>
                     <div className="text-right">
+                      {/* Mastercard logo */}
+                      <div className="flex items-center gap-0.5">
+                        <div className="w-8 h-8 bg-[#EB001B] rounded-full opacity-90"></div>
+                        <div className="w-8 h-8 bg-[#FF9800] rounded-full opacity-90 -ml-4"></div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div>
                       <p className="text-xs text-white/70">Expires</p>
                       <p className="font-semibold">{selectedCard.expiryDate}</p>
                     </div>
@@ -526,6 +611,12 @@ export default function CardManagement() {
                         </button>
                       </div>
                     </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 pt-2">
+                    <span className={`px-3 py-1 text-xs font-semibold rounded ${getStatusColor(selectedCard.status)}`}>
+                      {selectedCard.status.toUpperCase()}
+                    </span>
                   </div>
                 </div>
               </div>
