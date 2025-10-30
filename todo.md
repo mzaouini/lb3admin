@@ -62,3 +62,12 @@
 - [x] NAPS platform integration preparation (API endpoints ready)
 - [x] Card details modal with full card info
 - [x] PIN reset confirmation and security checks
+
+
+## URGENT: Fix Maker-Checker Permissions (Correct Model)
+- [x] Fix permissions.ts: Maker = Full operational access
+- [x] Fix permissions.ts: Checker = Approve/Reject only (limited)
+- [x] Fix permissions.ts: Support = Read-only
+- [x] Update card management access for Maker role
+- [x] Restrict Checker to approval actions only
+- [x] Test all three roles with correct permissions
