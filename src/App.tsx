@@ -9,6 +9,7 @@ import Reports from './pages/Reports';
 import Settings from './pages/Settings';
 import AdminUsers from './pages/AdminUsers';
 import EmployeeDetails from './pages/EmployeeDetails';
+import CardManagement from './pages/CardManagement';
 
 function AppContent() {
   const { isAuthenticated, loading, logout } = useAuth();
@@ -35,6 +36,7 @@ function AppContent() {
         <Route path="/reports" element={<Reports />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/admin-users" element={<AdminUsers />} />
+        <Route path="/cards" element={<CardManagement />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

@@ -4,12 +4,14 @@ import { useTransactions } from '../hooks/useTransactions';
 import { useEmployees } from '../hooks/useEmployees';
 import { approveSalaryAdvance, rejectSalaryAdvance } from '../services/database';
 import { useAuth } from '../contexts/AuthContext';
+import { getRolePermissions } from '../utils/permissions';
 
 type SortField = 'date' | 'amount' | 'employee';
 type SortOrder = 'asc' | 'desc';
 
 export default function Transactions() {
   const { user } = useAuth();
+  const permissions = user ? getRolePermissions(user.role) : null;
   const { transactions, pendingTransactions, loading, error, refetch } = useTransactions();
   const { employees } = useEmployees();
   const [searchTerm, setSearchTerm] = useState('');
@@ -483,7 +485,7 @@ export default function Transactions() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      {tx.status === 'pending' && user?.role === 'checker' && (
+                      {tx.status === 'pending' && permissions?.canApproveTransaction && (
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleApprove(tx.id)}

@@ -26,3 +26,39 @@
 - [ ] Sync employee details (name, phone, salary, bank account)
 - [ ] Sync transaction history
 - [ ] Show real transaction data in dashboard and reports
+
+## NEW: Enhanced Role-Based Access Control
+- [x] Maker role: Read + Create salary advance requests (no approval rights)
+- [x] Checker role: Read + Approve/Reject pending requests (no create rights)
+- [x] Support role: Read-only access across all screens (no actions)
+- [x] Update Transactions page with role-based action buttons
+- [ ] Update Employees page with role-based create/edit buttons
+- [x] Add permission checks in database service layer
+- [x] Show/hide UI elements based on user role
+- [x] Add role badge in header/sidebar
+
+## NEW: Card Management Section (Admin Only)
+- [x] Create Card Management page (/cards route)
+- [x] Card list view with all user cards
+- [x] Search and filter cards (by user, status, balance)
+- [x] Card activation/deactivation toggle
+- [x] Balance tracking display per card
+- [x] Transaction history per card (from card_transactions table)
+- [x] Card status management (Active, Inactive, Blocked, Pending)
+- [x] Card details modal/page with full information
+- [x] Restrict Card Management to Checker role only (admin access)
+- [x] Add Cards menu item to navigation
+- [ ] Query card_transactions table in database service
+- [ ] Add card statistics to Dashboard
+
+## Card Management - NAPS Platform Integration Features
+- [x] PIN management (reset PIN functionality)
+- [x] Freeze/unfreeze card toggle
+- [x] Block card (permanent) with confirmation
+- [x] Card activation workflow
+- [x] Link cards to existing users and transactions
+- [x] Generate mock card numbers for existing users
+- [x] Card balance calculation from transaction history
+- [x] NAPS platform integration preparation (API endpoints ready)
+- [x] Card details modal with full card info
+- [x] PIN reset confirmation and security checks

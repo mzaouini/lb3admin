@@ -14,23 +14,35 @@ import {
   Search
 } from 'lucide-react';
 import { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { getRoleDisplayName, getRoleBadgeColor, getRolePermissions } from '../utils/permissions';
 
 interface LayoutProps {
   children: ReactNode;
   onLogout: () => void;
 }
 
-const menuItems = [
-  { path: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { path: '/employees', label: 'Employees', icon: Users },
-  { path: '/transactions', label: 'Transactions', icon: CreditCard },
-  { path: '/reports', label: 'Reports', icon: FileText },
-  { path: '/settings', label: 'Settings', icon: Settings },
-  { path: '/admin-users', label: 'Admin Users', icon: UserCog },
+interface MenuItem {
+  path: string;
+  label: string;
+  icon: any;
+  requiresPermission?: keyof ReturnType<typeof getRolePermissions> | null;
+}
+
+const menuItems: MenuItem[] = [
+  { path: '/', label: 'Dashboard', icon: LayoutDashboard, requiresPermission: null },
+  { path: '/employees', label: 'Employees', icon: Users, requiresPermission: 'canViewEmployees' },
+  { path: '/transactions', label: 'Transactions', icon: CreditCard, requiresPermission: 'canViewTransactions' },
+  { path: '/cards', label: 'Card Management', icon: CreditCard, requiresPermission: 'canViewCards' },
+  { path: '/reports', label: 'Reports', icon: FileText, requiresPermission: 'canViewReports' },
+  { path: '/settings', label: 'Settings', icon: Settings, requiresPermission: null },
+  { path: '/admin-users', label: 'Admin Users', icon: UserCog, requiresPermission: 'canManageUsers' },
 ];
 
 export default function Layout({ children, onLogout }: LayoutProps) {
   const location = useLocation();
+  const { user } = useAuth();
+  const permissions = user ? getRolePermissions(user.role) : null;
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -39,6 +51,13 @@ export default function Layout({ children, onLogout }: LayoutProps) {
     localStorage.removeItem('admin_user');
     onLogout();
   };
+
+  // Filter menu items based on permissions
+  const visibleMenuItems = menuItems.filter(item => {
+    if (!item.requiresPermission) return true;
+    if (!permissions) return false;
+    return permissions[item.requiresPermission];
+  });
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -67,7 +86,7 @@ export default function Layout({ children, onLogout }: LayoutProps) {
 
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          {menuItems.map((item) => {
+          {visibleMenuItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
             
@@ -91,6 +110,15 @@ export default function Layout({ children, onLogout }: LayoutProps) {
 
         {/* User info and logout */}
         <div className="p-4 border-t border-white/10">
+          {isSidebarOpen && user && (
+            <div className="mb-3 px-4 py-2 bg-white/10 rounded-lg">
+              <p className="text-xs text-liberty-text-secondary">Logged in as</p>
+              <p className="text-sm font-semibold text-white">{user.name}</p>
+              <span className={`inline-block mt-1 px-2 py-0.5 text-xs font-semibold rounded ${getRoleBadgeColor(user.role)}`}>
+                {getRoleDisplayName(user.role)}
+              </span>
+            </div>
+          )}
           <button
             onClick={handleLogout}
             className="flex items-center gap-3 px-4 py-3 rounded-xl text-liberty-text-secondary hover:bg-white/10 hover:text-white transition-all w-full"
@@ -125,7 +153,7 @@ export default function Layout({ children, onLogout }: LayoutProps) {
 
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          {menuItems.map((item) => {
+          {visibleMenuItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
             
@@ -147,8 +175,17 @@ export default function Layout({ children, onLogout }: LayoutProps) {
           })}
         </nav>
 
-        {/* Logout */}
+        {/* User info and logout */}
         <div className="p-4 border-t border-white/10">
+          {user && (
+            <div className="mb-3 px-4 py-2 bg-white/10 rounded-lg">
+              <p className="text-xs text-liberty-text-secondary">Logged in as</p>
+              <p className="text-sm font-semibold text-white">{user.name}</p>
+              <span className={`inline-block mt-1 px-2 py-0.5 text-xs font-semibold rounded ${getRoleBadgeColor(user.role)}`}>
+                {getRoleDisplayName(user.role)}
+              </span>
+            </div>
+          )}
           <button
             onClick={handleLogout}
             className="flex items-center gap-3 px-4 py-3 rounded-xl text-liberty-text-secondary hover:bg-white/10 hover:text-white transition-all w-full"
@@ -191,11 +228,11 @@ export default function Layout({ children, onLogout }: LayoutProps) {
               </button>
               <div className="hidden sm:flex items-center gap-3 ml-4 pl-4 border-l border-gray-200">
                 <div className="w-10 h-10 rounded-full bg-liberty-accent flex items-center justify-center text-white font-semibold">
-                  AM
+                  {user?.name?.charAt(0).toUpperCase() || 'A'}
                 </div>
                 <div className="hidden lg:block">
-                  <p className="text-sm font-semibold text-gray-900">Admin User</p>
-                  <p className="text-xs text-gray-500">Super Admin</p>
+                  <p className="text-sm font-semibold text-gray-900">{user?.name || 'Admin User'}</p>
+                  <p className="text-xs text-gray-500">{user ? getRoleDisplayName(user.role) : 'Admin'}</p>
                 </div>
               </div>
             </div>
