@@ -35,38 +35,53 @@ export default function Login({ onLogin }: LoginProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-liberty-navy via-liberty-teal to-liberty-navy flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-        {/* Logo Section */}
-        <div className="bg-gradient-to-r from-liberty-teal to-liberty-mint p-8 text-center">
-          <div className="inline-block bg-white rounded-full p-4 mb-4">
-            <svg width="80" height="80" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-              {/* Liberty Pay Logo - Stylized LP with payment card */}
-              <circle cx="50" cy="50" r="45" fill="#00C48C" opacity="0.1"/>
-              <path d="M25 30 L25 70 L45 70" stroke="#00C48C" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M55 40 C55 35 60 30 65 30 C70 30 75 35 75 40 L75 50 C75 55 70 60 65 60 L55 60" stroke="#1a2332" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
-              <rect x="50" y="45" width="30" height="20" rx="3" fill="#00C48C" opacity="0.3"/>
-              <line x1="55" y1="52" x2="75" y2="52" stroke="#00C48C" strokeWidth="2" strokeLinecap="round"/>
-              <line x1="55" y1="58" x2="70" y2="58" stroke="#00C48C" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
+    <div className="min-h-screen bg-gradient-to-br from-liberty-teal via-liberty-mint to-liberty-teal flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Animated background circles */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+      </div>
+
+      <div className="relative z-10 bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
+        {/* Logo Section with Green Gradient */}
+        <div className="bg-gradient-to-br from-liberty-teal to-liberty-mint p-10 text-center relative">
+          {/* Decorative circles */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12"></div>
+          
+          <div className="relative">
+            {/* Logo */}
+            <div className="inline-block bg-white rounded-2xl p-5 mb-4 shadow-lg">
+              <svg width="70" height="70" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                {/* Liberty Pay Logo - Stylized LP with payment card */}
+                <circle cx="50" cy="50" r="45" fill="#00C48C" opacity="0.1"/>
+                <path d="M25 30 L25 70 L45 70" stroke="#00C48C" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M55 40 C55 35 60 30 65 30 C70 30 75 35 75 40 L75 50 C75 55 70 60 65 60 L55 60" stroke="#1a2332" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round"/>
+                <rect x="50" y="45" width="30" height="20" rx="3" fill="#00C48C" opacity="0.3"/>
+                <line x1="55" y1="52" x2="75" y2="52" stroke="#00C48C" strokeWidth="2.5" strokeLinecap="round"/>
+                <line x1="55" y1="58" x2="70" y2="58" stroke="#00C48C" strokeWidth="2.5" strokeLinecap="round"/>
+              </svg>
+            </div>
+            <h1 className="text-4xl font-bold text-white mb-2 drop-shadow-lg">LibertyPay</h1>
+            <p className="text-white/95 text-base font-medium">Admin Panel</p>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">LibertyPay</h1>
-          <p className="text-white/90 text-sm">Admin Panel</p>
         </div>
 
         {/* Login Form */}
         <div className="p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Welcome Back</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">Welcome Back</h2>
+          <p className="text-gray-600 text-sm text-center mb-6">Sign in to access your admin dashboard</p>
           
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+              <div className="bg-red-50 border-l-4 border-liberty-error text-red-700 px-4 py-3 rounded-r-lg text-sm">
                 {error}
               </div>
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
                 Email Address
               </label>
               <input
@@ -74,7 +89,7 @@ export default function Login({ onLogin }: LoginProps) {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-liberty-teal focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-liberty-teal focus:border-liberty-teal outline-none transition-all"
                 placeholder="admin@libertypay.ma"
                 required
                 autoComplete="email"
@@ -82,7 +97,7 @@ export default function Login({ onLogin }: LoginProps) {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
                 Password
               </label>
               <input
@@ -90,7 +105,7 @@ export default function Login({ onLogin }: LoginProps) {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-liberty-teal focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-liberty-teal focus:border-liberty-teal outline-none transition-all"
                 placeholder="Enter your password"
                 required
                 autoComplete="current-password"
@@ -100,16 +115,16 @@ export default function Login({ onLogin }: LoginProps) {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-liberty-teal to-liberty-mint hover:from-liberty-mint hover:to-liberty-teal text-white font-semibold py-4 px-4 rounded-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
+              className="w-full bg-gradient-to-r from-liberty-teal to-liberty-mint hover:from-liberty-mint hover:to-liberty-teal text-white font-bold py-4 px-4 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl"
             >
               {isLoading ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
                   <span>Signing in...</span>
                 </>
               ) : (
                 <>
-                  <LogIn size={20} />
+                  <LogIn size={22} />
                   <span>Sign In</span>
                 </>
               )}
@@ -117,24 +132,34 @@ export default function Login({ onLogin }: LoginProps) {
           </form>
 
           {/* Demo credentials */}
-          <div className="mt-6 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200">
-            <p className="text-xs text-gray-700 font-semibold mb-2">📋 Demo Credentials:</p>
-            <div className="space-y-1">
-              <p className="text-xs text-gray-600">
-                <span className="font-medium">Maker:</span> maker@libertypay.ma
-              </p>
-              <p className="text-xs text-gray-600">
-                <span className="font-medium">Checker:</span> checker@libertypay.ma
-              </p>
-              <p className="text-xs text-gray-600">
-                <span className="font-medium">Support:</span> support@libertypay.ma
-              </p>
-              <p className="text-xs text-gray-500 mt-2 italic">
-                Password: <span className="font-mono bg-gray-200 px-1 rounded">admin123</span>
-              </p>
+          <div className="mt-6 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+            <p className="text-xs text-gray-700 font-bold mb-3 flex items-center gap-2">
+              <span className="text-lg">🔑</span>
+              Demo Credentials
+            </p>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-gray-600 font-medium">Maker:</span>
+                <span className="text-gray-800 font-mono bg-white px-2 py-1 rounded">maker@libertypay.ma</span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-gray-600 font-medium">Checker:</span>
+                <span className="text-gray-800 font-mono bg-white px-2 py-1 rounded">checker@libertypay.ma</span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-gray-600 font-medium">Support:</span>
+                <span className="text-gray-800 font-mono bg-white px-2 py-1 rounded">support@libertypay.ma</span>
+              </div>
+              <div className="pt-2 mt-2 border-t border-gray-300">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-600 font-medium">Password:</span>
+                  <span className="text-gray-800 font-mono bg-white px-2 py-1 rounded font-bold">admin123</span>
+                </div>
+              </div>
             </div>
-            <p className="text-xs text-gray-500 mt-3 pt-3 border-t border-gray-300">
-              💡 Run SETUP_ADMIN_USERS.sql in Supabase first
+            <p className="text-xs text-gray-500 mt-3 pt-3 border-t border-gray-300 flex items-center gap-1">
+              <span>💡</span>
+              <span>Run SETUP_ADMIN_USERS.sql in Supabase first</span>
             </p>
           </div>
         </div>
