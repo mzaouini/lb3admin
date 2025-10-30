@@ -53,15 +53,7 @@ export default function Login({ onLogin }: LoginProps) {
           <div className="relative">
             {/* Logo */}
             <div className="inline-block bg-white rounded-2xl p-5 mb-4 shadow-lg">
-              <svg width="70" height="70" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                {/* Liberty Pay Logo - Stylized LP with payment card */}
-                <circle cx="50" cy="50" r="45" fill="#00C48C" opacity="0.1"/>
-                <path d="M25 30 L25 70 L45 70" stroke="#00C48C" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M55 40 C55 35 60 30 65 30 C70 30 75 35 75 40 L75 50 C75 55 70 60 65 60 L55 60" stroke="#1a2332" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round"/>
-                <rect x="50" y="45" width="30" height="20" rx="3" fill="#00C48C" opacity="0.3"/>
-                <line x1="55" y1="52" x2="75" y2="52" stroke="#00C48C" strokeWidth="2.5" strokeLinecap="round"/>
-                <line x1="55" y1="58" x2="70" y2="58" stroke="#00C48C" strokeWidth="2.5" strokeLinecap="round"/>
-              </svg>
+              <img src="/libertypay-logo.png" alt="LibertyPay Logo" className="w-20 h-20 object-contain" />
             </div>
             <h1 className="text-4xl font-bold text-white mb-2 drop-shadow-lg">LibertyPay</h1>
             <p className="text-white/95 text-base font-medium">Admin Panel</p>

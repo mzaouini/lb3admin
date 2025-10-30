@@ -46,11 +46,16 @@ export default function Layout({ children, onLogout }: LayoutProps) {
       <aside className={`${isSidebarOpen ? 'w-64' : 'w-20'} bg-liberty-primary hidden lg:flex flex-col transition-all duration-300 fixed h-full z-30`}>
         {/* Logo */}
         <div className="p-6 flex items-center justify-between border-b border-white/10">
-          {isSidebarOpen && (
-            <div>
-              <h1 className="text-xl font-bold text-liberty-accent">LibertyPay</h1>
-              <p className="text-xs text-liberty-text-secondary">Admin Portal</p>
+          {isSidebarOpen ? (
+            <div className="flex items-center gap-3">
+              <img src="/libertypay-logo.png" alt="LibertyPay" className="w-10 h-10 object-contain" />
+              <div>
+                <h1 className="text-xl font-bold text-liberty-accent">LibertyPay</h1>
+                <p className="text-xs text-liberty-text-secondary">Admin Portal</p>
+              </div>
             </div>
+          ) : (
+            <img src="/libertypay-logo.png" alt="LibertyPay" className="w-8 h-8 object-contain" />
           )}
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
