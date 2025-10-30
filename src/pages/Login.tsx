@@ -157,10 +157,7 @@ export default function Login({ onLogin }: LoginProps) {
                 </div>
               </div>
             </div>
-            <p className="text-xs text-gray-500 mt-3 pt-3 border-t border-gray-300 flex items-center gap-1">
-              <span>💡</span>
-              <span>Run SETUP_ADMIN_USERS.sql in Supabase first</span>
-            </p>
+
           </div>
         </div>
       </div>
