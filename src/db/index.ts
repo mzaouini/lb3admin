@@ -3,7 +3,7 @@ import postgres from 'postgres';
 import * as schema from './schema';
 
 // Database connection string - will use same database as main app
-const connectionString = import.meta.env.VITE_DATABASE_URL || process.env.DATABASE_URL || '';
+const connectionString = import.meta.env.VITE_DATABASE_URL || '';
 
 if (!connectionString) {
   throw new Error('DATABASE_URL environment variable is required');

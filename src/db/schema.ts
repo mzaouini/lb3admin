@@ -140,7 +140,7 @@ export type InsertAuditLog = typeof auditLogs.$inferInsert;
 /**
  * Organizations/Companies table
  */
-export const organizations = pgTable("organizations", {
+export const organizations: any = pgTable("organizations", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   name: varchar("name", { length: 255 }).notNull(),
   code: varchar("code", { length: 50 }).unique(),

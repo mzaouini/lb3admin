@@ -12,7 +12,6 @@ const mockEmployees = [
 
 export default function Employees() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [showAddModal, setShowAddModal] = useState(false);
 
   const filteredEmployees = mockEmployees.filter(emp =>
     emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -38,7 +37,6 @@ export default function Employees() {
             <span>Export</span>
           </button>
           <button 
-            onClick={() => setShowAddModal(true)}
             className="flex items-center gap-2 px-4 py-2 bg-liberty-teal text-white rounded-lg hover:bg-liberty-mint transition-colors"
           >
             <Plus size={18} />
