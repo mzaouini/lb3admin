@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Link, useLocation } from 'wouter';
+import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Users, 
@@ -30,7 +30,7 @@ const menuItems = [
 ];
 
 export default function Layout({ children, onLogout }: LayoutProps) {
-  const [location] = useLocation();
+  const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -64,21 +64,21 @@ export default function Layout({ children, onLogout }: LayoutProps) {
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {menuItems.map((item) => {
             const Icon = item.icon;
-            const isActive = location === item.path;
+            const isActive = location.pathname === item.path;
             
             return (
-              <Link key={item.path} href={item.path}>
-                <a
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                    isActive
-                      ? 'bg-liberty-accent text-white shadow-lg shadow-liberty-accent/30'
-                      : 'text-liberty-text-secondary hover:bg-white/10 hover:text-white'
-                  }`}
-                  title={!isSidebarOpen ? item.label : undefined}
-                >
-                  <Icon size={20} />
-                  {isSidebarOpen && <span className="font-medium">{item.label}</span>}
-                </a>
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                  isActive
+                    ? 'bg-liberty-accent text-white shadow-lg shadow-liberty-accent/30'
+                    : 'text-liberty-text-secondary hover:bg-white/10 hover:text-white'
+                }`}
+                title={!isSidebarOpen ? item.label : undefined}
+              >
+                <Icon size={20} />
+                {isSidebarOpen && <span className="font-medium">{item.label}</span>}
               </Link>
             );
           })}
@@ -122,21 +122,21 @@ export default function Layout({ children, onLogout }: LayoutProps) {
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {menuItems.map((item) => {
             const Icon = item.icon;
-            const isActive = location === item.path;
+            const isActive = location.pathname === item.path;
             
             return (
-              <Link key={item.path} href={item.path}>
-                <a
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                    isActive
-                      ? 'bg-liberty-accent text-white shadow-lg shadow-liberty-accent/30'
-                      : 'text-liberty-text-secondary hover:bg-white/10 hover:text-white'
-                  }`}
-                >
-                  <Icon size={20} />
-                  <span className="font-medium">{item.label}</span>
-                </a>
+              <Link
+                key={item.path}
+                to={item.path}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                  isActive
+                    ? 'bg-liberty-accent text-white shadow-lg shadow-liberty-accent/30'
+                    : 'text-liberty-text-secondary hover:bg-white/10 hover:text-white'
+                }`}
+              >
+                <Icon size={20} />
+                <span className="font-medium">{item.label}</span>
               </Link>
             );
           })}
