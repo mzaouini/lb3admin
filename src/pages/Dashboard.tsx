@@ -2,10 +2,12 @@ import { Users, CreditCard, TrendingUp, DollarSign, ArrowUp, ArrowDown, Loader2 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useDashboardStats } from '../hooks/useDashboardStats';
 import { useTransactions } from '../hooks/useTransactions';
+import { useOrganization } from '../hooks/useOrganization';
 
 export default function Dashboard() {
   const { stats, loading: statsLoading } = useDashboardStats();
   const { transactions, loading: transactionsLoading } = useTransactions();
+  const { organization } = useOrganization();
 
   const loading = statsLoading || transactionsLoading;
 
@@ -78,9 +80,34 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       {/* Welcome Message */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-1">Welcome back! Here's what's happening today.</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600 mt-1">Welcome back! Here's what's happening today.</p>
+        </div>
+        {organization && (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-liberty-accent flex items-center justify-center text-white text-xl font-bold">
+                {organization.name.charAt(0)}
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900">{organization.name}</h3>
+                <p className="text-sm text-gray-600">{organization.code}</p>
+              </div>
+            </div>
+            {(organization.contact_email || organization.contact_phone) && (
+              <div className="mt-3 pt-3 border-t border-gray-200 space-y-1">
+                {organization.contact_email && (
+                  <p className="text-sm text-gray-600">📧 {organization.contact_email}</p>
+                )}
+                {organization.contact_phone && (
+                  <p className="text-sm text-gray-600">📞 {organization.contact_phone}</p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Stats Grid */}

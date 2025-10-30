@@ -8,6 +8,7 @@ import Transactions from './pages/Transactions';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
 import AdminUsers from './pages/AdminUsers';
+import EmployeeDetails from './pages/EmployeeDetails';
 
 function AppContent() {
   const { isAuthenticated, loading, logout } = useAuth();
@@ -29,6 +30,7 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/employees" element={<Employees />} />
+        <Route path="/employees/:id" element={<EmployeeDetails />} />
         <Route path="/transactions" element={<Transactions />} />
         <Route path="/reports" element={<Reports />} />
         <Route path="/settings" element={<Settings />} />

@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { Plus, Search, Download, Upload, Eye, Loader2, SlidersHorizontal, X } from 'lucide-react';
 import { useEmployees } from '../hooks/useEmployees';
 
@@ -387,9 +388,12 @@ export default function Employees() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button className="text-liberty-teal hover:text-liberty-mint mr-3">
+                      <Link
+                        to={`/employees/${employee.id}`}
+                        className="text-liberty-teal hover:text-liberty-mint mr-3 inline-block"
+                      >
                         <Eye size={18} />
-                      </button>
+                      </Link>
                     </td>
                   </tr>
                 ))
