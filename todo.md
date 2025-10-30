@@ -94,3 +94,10 @@
 - [x] Filter by employee email
 - [x] Filter by employee company
 - [x] Combined search across all employee fields
+
+
+## Login Page Cleanup
+- [x] Remove blue header section from login page
+- [x] Remove "Liberty Pay Admin Portal" title
+- [x] Remove "Welcome Back" text
+- [x] Keep "Sign in to access your admin dashboard" subtitle (moved to form body)

@@ -94,17 +94,11 @@ export default function Login() {
           {/* Right side - Login form */}
           <div className="animate-slide-in-right">
             <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden transform hover:shadow-3xl transition-all duration-300">
-              {/* Form header */}
-              <div className="bg-gradient-to-r from-liberty-primary to-liberty-primary/90 p-8 text-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9IndoaXRlIiBmaWxsLW9wYWNpdHk9IjAuMSIvPjwvc3ZnPg==')] opacity-50"></div>
-                <div className="relative">
-                  <h2 className="text-3xl font-bold text-white mb-2">Welcome Back</h2>
-                  <p className="text-white/90">Sign in to access your admin dashboard</p>
-                </div>
-              </div>
-
               {/* Form body */}
               <div className="p-8 space-y-6">
+                <div className="text-center mb-6">
+                  <p className="text-gray-600 text-sm">Sign in to access your admin dashboard</p>
+                </div>
                 {error && (
                   <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg animate-shake">
                     <p className="text-red-700 text-sm font-medium">{error}</p>
