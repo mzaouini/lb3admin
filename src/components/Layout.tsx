@@ -48,14 +48,14 @@ export default function Layout({ children, onLogout }: LayoutProps) {
         <div className="p-6 flex items-center justify-between border-b border-white/10">
           {isSidebarOpen ? (
             <div className="flex items-center gap-3">
-              <img src="/libertypay-logo.png" alt="LibertyPay" className="w-10 h-10 object-contain" />
+              <img src="/libertypay-logo.svg" alt="LibertyPay" className="w-24 h-10 object-contain" />
               <div>
                 <h1 className="text-xl font-bold text-liberty-accent">LibertyPay</h1>
                 <p className="text-xs text-liberty-text-secondary">Admin Portal</p>
               </div>
             </div>
           ) : (
-            <img src="/libertypay-logo.png" alt="LibertyPay" className="w-8 h-8 object-contain" />
+            <img src="/libertypay-logo.svg" alt="LibertyPay" className="w-16 h-8 object-contain" />
           )}
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}

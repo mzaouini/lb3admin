@@ -53,7 +53,7 @@ export default function Login({ onLogin }: LoginProps) {
           <div className="relative">
             {/* Logo */}
             <div className="inline-block bg-white rounded-2xl p-5 mb-4 shadow-lg">
-              <img src="/libertypay-logo.png" alt="LibertyPay Logo" className="w-20 h-20 object-contain" />
+              <img src="/libertypay-logo.svg" alt="LibertyPay Logo" className="w-32 h-16 object-contain" />
             </div>
             <h1 className="text-4xl font-bold text-white mb-2 drop-shadow-lg">LibertyPay</h1>
             <p className="text-white/95 text-base font-medium">Admin Panel</p>
