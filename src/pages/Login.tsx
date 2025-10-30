@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { LogIn } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 interface LoginProps {
   onLogin: () => void;
 }
 
 export default function Login({ onLogin }: LoginProps) {
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -16,27 +18,20 @@ export default function Login({ onLogin }: LoginProps) {
     setError('');
     setIsLoading(true);
 
-    // Demo login with role-based access
-    setTimeout(() => {
-      let user = null;
+    try {
+      const success = await login(email, password);
       
-      if (email === 'maker@libertypay.ma' && password === 'admin123') {
-        user = { email, name: 'Operations Maker', role: 'maker' };
-      } else if (email === 'checker@libertypay.ma' && password === 'admin123') {
-        user = { email, name: 'Admin Checker', role: 'checker' };
-      } else if (email === 'support@libertypay.ma' && password === 'admin123') {
-        user = { email, name: 'Support Agent', role: 'support' };
-      }
-      
-      if (user) {
-        localStorage.setItem('admin_token', 'demo-token-' + Date.now());
-        localStorage.setItem('admin_user', JSON.stringify(user));
+      if (success) {
         onLogin();
       } else {
-        setError('Invalid email or password');
+        setError('Invalid email or password. Please check your credentials.');
       }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('An error occurred during login. Please try again.');
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -51,7 +46,7 @@ export default function Login({ onLogin }: LoginProps) {
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
               {error}
             </div>
           )}
@@ -68,6 +63,7 @@ export default function Login({ onLogin }: LoginProps) {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-liberty-teal focus:border-transparent outline-none"
               placeholder="admin@libertypay.ma"
               required
+              autoComplete="email"
             />
           </div>
 
@@ -83,6 +79,7 @@ export default function Login({ onLogin }: LoginProps) {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-liberty-teal focus:border-transparent outline-none"
               placeholder="Enter your password"
               required
+              autoComplete="current-password"
             />
           </div>
 
@@ -105,9 +102,12 @@ export default function Login({ onLogin }: LoginProps) {
         {/* Demo credentials */}
         <div className="mt-6 p-4 bg-gray-50 rounded-lg">
           <p className="text-xs text-gray-600 font-semibold mb-2">Demo Credentials (Password: admin123):</p>
-          <p className="text-xs text-gray-600">Maker: maker@libertypay.ma</p>
-          <p className="text-xs text-gray-600">Checker: checker@libertypay.ma</p>
-          <p className="text-xs text-gray-600">Support: support@libertypay.ma</p>
+          <p className="text-xs text-gray-600">• Maker: maker@libertypay.ma</p>
+          <p className="text-xs text-gray-600">• Checker: checker@libertypay.ma</p>
+          <p className="text-xs text-gray-600">• Support: support@libertypay.ma</p>
+          <p className="text-xs text-gray-500 mt-2 italic">
+            Note: Run SETUP_ADMIN_USERS.sql in Supabase first
+          </p>
         </div>
       </div>
     </div>

@@ -1,23 +1,36 @@
 import { useState } from 'react';
-import { Plus, Search, Download, Upload, Edit, Trash2, Eye } from 'lucide-react';
-
-// Mock employee data
-const mockEmployees = [
-  { id: 1, name: 'Ahmed El Mansouri', email: 'ahmed.mansouri@company.ma', phone: '+212 612345678', salary: 15000, company: 'Tech Corp', status: 'Active', joinDate: '2024-01-15' },
-  { id: 2, name: 'Fatima Zahra', email: 'fatima.zahra@company.ma', phone: '+212 623456789', salary: 12000, company: 'Tech Corp', status: 'Active', joinDate: '2024-02-20' },
-  { id: 3, name: 'Mohammed Alami', email: 'mohammed.alami@company.ma', phone: '+212 634567890', salary: 18000, company: 'Finance Inc', status: 'Active', joinDate: '2023-11-10' },
-  { id: 4, name: 'Sara Bennani', email: 'sara.bennani@company.ma', phone: '+212 645678901', salary: 14000, company: 'Tech Corp', status: 'Active', joinDate: '2024-03-05' },
-  { id: 5, name: 'Youssef Idrissi', email: 'youssef.idrissi@company.ma', phone: '+212 656789012', salary: 16000, company: 'Retail Co', status: 'Inactive', joinDate: '2023-09-12' },
-];
+import { Plus, Search, Download, Upload, Eye, Loader2 } from 'lucide-react';
+import { useEmployees } from '../hooks/useEmployees';
 
 export default function Employees() {
+  const { employees, loading, error } = useEmployees();
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredEmployees = mockEmployees.filter(emp =>
-    emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    emp.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    emp.company.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredEmployees = employees.filter(emp =>
+    (emp.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+    (emp.email?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+    (emp.company?.toLowerCase() || '').includes(searchTerm.toLowerCase())
   );
+
+  const activeEmployees = employees.filter(emp => emp.kyc_status === 'verified').length;
+  const totalSalary = employees.reduce((sum, emp) => sum + (emp.net_salary || 0), 0);
+  const avgSalary = employees.length > 0 ? Math.round(totalSalary / employees.length) : 0;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <Loader2 className="w-8 h-8 animate-spin text-liberty-teal" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        {error}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -49,129 +62,119 @@ export default function Employees() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
           <p className="text-sm text-gray-600">Total Employees</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">1,234</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">{employees.length}</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
           <p className="text-sm text-gray-600">Active</p>
-          <p className="text-2xl font-bold text-green-600 mt-1">1,156</p>
+          <p className="text-2xl font-bold text-green-600 mt-1">{activeEmployees}</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
-          <p className="text-sm text-gray-600">Inactive</p>
-          <p className="text-2xl font-bold text-gray-600 mt-1">78</p>
+          <p className="text-sm text-gray-600">Total Salary</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">{totalSalary.toLocaleString()} Dhs</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
           <p className="text-sm text-gray-600">Avg. Salary</p>
-          <p className="text-2xl font-bold text-liberty-teal mt-1">15,000 Dhs</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">{avgSalary.toLocaleString()} Dhs</p>
         </div>
       </div>
 
-      {/* Search and Filters */}
-      <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-        <div className="flex items-center gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="text"
-              placeholder="Search employees by name, email, or company..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-liberty-teal focus:border-transparent outline-none"
-            />
-          </div>
-          <select className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-liberty-teal focus:border-transparent outline-none">
-            <option>All Companies</option>
-            <option>Tech Corp</option>
-            <option>Finance Inc</option>
-            <option>Retail Co</option>
-          </select>
-          <select className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-liberty-teal focus:border-transparent outline-none">
-            <option>All Status</option>
-            <option>Active</option>
-            <option>Inactive</option>
-          </select>
+      {/* Search Bar */}
+      <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+          <input
+            type="text"
+            placeholder="Search by name, email, or company..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-liberty-teal focus:border-transparent outline-none"
+          />
         </div>
       </div>
 
-      {/* Employee Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      {/* Employees Table */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Salary</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Join Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Employee
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Contact
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Company
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Salary
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredEmployees.map((employee) => (
-                <tr key={employee.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="h-10 w-10 flex-shrink-0">
-                        <div className="h-10 w-10 rounded-full bg-liberty-teal flex items-center justify-center text-white font-semibold">
-                          {employee.name.split(' ').map(n => n[0]).join('')}
-                        </div>
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{employee.name}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{employee.email}</div>
-                    <div className="text-sm text-gray-500">{employee.phone}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{employee.company}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{employee.salary.toLocaleString()} Dhs</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      employee.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {employee.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{employee.joinDate}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center gap-2">
-                      <button className="text-liberty-teal hover:text-liberty-mint" title="View">
-                        <Eye size={18} />
-                      </button>
-                      <button className="text-blue-600 hover:text-blue-800" title="Edit">
-                        <Edit size={18} />
-                      </button>
-                      <button className="text-red-600 hover:text-red-800" title="Delete">
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
+              {filteredEmployees.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                    {searchTerm ? 'No employees found matching your search' : 'No employees yet'}
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filteredEmployees.map((employee) => (
+                  <tr key={employee.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10 bg-liberty-teal rounded-full flex items-center justify-center">
+                          <span className="text-white font-semibold">
+                            {employee.name?.charAt(0) || 'U'}
+                          </span>
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">{employee.name || 'Unknown'}</div>
+                          <div className="text-sm text-gray-500">ID: {employee.id}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{employee.email || 'N/A'}</div>
+                      <div className="text-sm text-gray-500">{employee.phone_number || 'N/A'}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{employee.company || 'N/A'}</div>
+                      <div className="text-sm text-gray-500">{employee.city || 'N/A'}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-semibold text-gray-900">
+                        {employee.net_salary?.toLocaleString() || '0'} Dhs
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        employee.kyc_status === 'verified'
+                          ? 'bg-green-100 text-green-800'
+                          : employee.kyc_status === 'pending'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {employee.kyc_status || 'pending'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button className="text-liberty-teal hover:text-liberty-mint mr-3">
+                        <Eye size={18} />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
-        </div>
-
-        {/* Pagination */}
-        <div className="bg-gray-50 px-6 py-4 flex items-center justify-between border-t border-gray-200">
-          <div className="text-sm text-gray-600">
-            Showing <span className="font-medium">1</span> to <span className="font-medium">5</span> of{' '}
-            <span className="font-medium">1,234</span> results
-          </div>
-          <div className="flex gap-2">
-            <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-white transition-colors">
-              Previous
-            </button>
-            <button className="px-4 py-2 bg-liberty-teal text-white rounded-lg">1</button>
-            <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-white transition-colors">2</button>
-            <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-white transition-colors">3</button>
-            <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-white transition-colors">
-              Next
-            </button>
-          </div>
         </div>
       </div>
     </div>

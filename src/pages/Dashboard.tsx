@@ -1,28 +1,33 @@
-import { Users, CreditCard, TrendingUp, DollarSign, ArrowUp, ArrowDown } from 'lucide-react';
+import { Users, CreditCard, TrendingUp, DollarSign, ArrowUp, ArrowDown, Loader2 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { mockTransactions, mockCompany, mockPendingTransactions } from '../data/mockData';
-
-// Calculate real data from Meryem's transactions
-const totalVolume = mockTransactions.reduce((sum, t) => sum + t.amount, 0);
-const avgAdvance = Math.round(totalVolume / mockTransactions.length);
-const activeAdvances = mockTransactions.filter(t => t.status === 'completed').length;
-
-// Transaction data by month (based on Meryem's transactions)
-const transactionData = [
-  { month: 'Oct', amount: totalVolume },
-];
-
-const statusData = [
-  { name: 'Completed', value: mockTransactions.length, color: '#4CAF50' },
-  { name: 'Pending', value: mockPendingTransactions.length, color: '#FF9800' },
-  { name: 'Rejected', value: 0, color: '#F44336' },
-];
+import { useDashboardStats } from '../hooks/useDashboardStats';
+import { useTransactions } from '../hooks/useTransactions';
 
 export default function Dashboard() {
-  const stats = [
+  const { stats, loading: statsLoading } = useDashboardStats();
+  const { transactions, loading: transactionsLoading } = useTransactions();
+
+  const loading = statsLoading || transactionsLoading;
+
+  // Transaction data by month
+  const transactionData = [
+    { month: 'Oct', amount: stats.totalVolume },
+  ];
+
+  const completedCount = transactions.filter(t => t.status === 'disbursed').length;
+  const pendingCount = transactions.filter(t => t.status === 'pending').length;
+  const rejectedCount = transactions.filter(t => t.status === 'rejected').length;
+
+  const statusData = [
+    { name: 'Completed', value: completedCount, color: '#4CAF50' },
+    { name: 'Pending', value: pendingCount, color: '#FF9800' },
+    { name: 'Rejected', value: rejectedCount, color: '#F44336' },
+  ];
+
+  const dashboardStats = [
     {
       title: 'Total Employees',
-      value: mockCompany.totalEmployees.toString(),
+      value: stats.totalEmployees.toString(),
       change: '+0%',
       isPositive: true,
       icon: Users,
@@ -30,7 +35,7 @@ export default function Dashboard() {
     },
     {
       title: 'Active Advances',
-      value: activeAdvances.toString(),
+      value: stats.activeAdvances.toString(),
       change: '+0%',
       isPositive: true,
       icon: CreditCard,
@@ -38,7 +43,7 @@ export default function Dashboard() {
     },
     {
       title: 'Total Volume',
-      value: `${totalVolume.toLocaleString()} Dhs`,
+      value: `${stats.totalVolume.toLocaleString()} Dhs`,
       change: '+0%',
       isPositive: true,
       icon: TrendingUp,
@@ -46,7 +51,7 @@ export default function Dashboard() {
     },
     {
       title: 'Avg. Advance',
-      value: `${avgAdvance.toLocaleString()} Dhs`,
+      value: `${stats.avgAdvance.toLocaleString()} Dhs`,
       change: '+0%',
       isPositive: true,
       icon: DollarSign,
@@ -54,13 +59,21 @@ export default function Dashboard() {
     },
   ];
 
-  const recentTransactions = mockTransactions.slice(0, 5).map(t => ({
+  const recentTransactions = transactions.slice(0, 5).map(t => ({
     id: t.id,
     employee: t.employeeName,
     amount: `${t.amount.toLocaleString()} Dhs`,
     status: t.status,
-    date: new Date(t.requestedAt).toLocaleDateString('en-GB'),
+    date: new Date(t.requested_at).toLocaleDateString('en-GB'),
   }));
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <Loader2 className="w-8 h-8 animate-spin text-liberty-teal" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -72,7 +85,7 @@ export default function Dashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => {
+        {dashboardStats.map((stat, index) => {
           const Icon = stat.icon;
           return (
             <div key={index} className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow p-6">
@@ -98,17 +111,16 @@ export default function Dashboard() {
         <div className="bg-white rounded-2xl shadow-sm p-6">
           <h2 className="text-xl font-bold text-gray-900 mb-6">Transaction Volume</h2>
           <p className="text-sm text-gray-600 mb-4">Monthly salary advances</p>
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={250}>
             <BarChart data={transactionData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="month" stroke="#666" />
               <YAxis stroke="#666" />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: '#fff', 
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: '#fff',
                   border: '1px solid #e0e0e0',
                   borderRadius: '8px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                 }}
               />
               <Bar dataKey="amount" fill="#00C48C" radius={[8, 8, 0, 0]} />
@@ -116,18 +128,18 @@ export default function Dashboard() {
           </ResponsiveContainer>
         </div>
 
-        {/* Status Distribution */}
+        {/* Transaction Status Chart */}
         <div className="bg-white rounded-2xl shadow-sm p-6">
           <h2 className="text-xl font-bold text-gray-900 mb-6">Transaction Status</h2>
           <p className="text-sm text-gray-600 mb-4">Distribution by status</p>
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={250}>
             <PieChart>
               <Pie
                 data={statusData}
                 cx="50%"
                 cy="50%"
                 innerRadius={60}
-                outerRadius={100}
+                outerRadius={90}
                 paddingAngle={5}
                 dataKey="value"
               >
@@ -139,10 +151,10 @@ export default function Dashboard() {
             </PieChart>
           </ResponsiveContainer>
           <div className="flex justify-center gap-6 mt-4">
-            {statusData.map((item, index) => (
+            {statusData.map((entry, index) => (
               <div key={index} className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
-                <span className="text-sm text-gray-600">{item.name}: {item.value}</span>
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }}></div>
+                <span className="text-sm text-gray-600">{entry.name}: {entry.value}</span>
               </div>
             ))}
           </div>
@@ -151,43 +163,51 @@ export default function Dashboard() {
 
       {/* Recent Transactions */}
       <div className="bg-white rounded-2xl shadow-sm p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Recent Transactions</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-gray-900">Recent Transactions</h2>
+          <a href="/transactions" className="text-liberty-teal hover:text-liberty-mint text-sm font-semibold">
+            View All →
+          </a>
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Transaction ID</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Employee</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Amount</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Status</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Date</th>
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Employee</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
               </tr>
             </thead>
-            <tbody>
-              {recentTransactions.map((transaction) => (
-                <tr key={transaction.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                  <td className="py-4 px-4 text-sm font-medium text-gray-900">{transaction.id}</td>
-                  <td className="py-4 px-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-liberty-primary to-liberty-accent flex items-center justify-center text-white font-semibold text-sm">
-                        {transaction.employee.charAt(0)}
-                      </div>
-                      <span className="text-sm font-medium text-gray-900">{transaction.employee}</span>
-                    </div>
+            <tbody className="divide-y divide-gray-200">
+              {recentTransactions.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                    No transactions yet
                   </td>
-                  <td className="py-4 px-4 text-sm font-semibold text-gray-900">{transaction.amount}</td>
-                  <td className="py-4 px-4">
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-                      transaction.status === 'completed' ? 'bg-green-100 text-green-800' :
-                      transaction.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
-                      {transaction.status}
-                    </span>
-                  </td>
-                  <td className="py-4 px-4 text-sm text-gray-600">{transaction.date}</td>
                 </tr>
-              ))}
+              ) : (
+                recentTransactions.map((tx) => (
+                  <tr key={tx.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 text-sm text-gray-900">SA-{tx.id}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{tx.employee}</td>
+                    <td className="px-4 py-3 text-sm font-semibold text-gray-900">{tx.amount}</td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                        tx.status === 'disbursed' || tx.status === 'approved'
+                          ? 'bg-green-100 text-green-800'
+                          : tx.status === 'pending'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {tx.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600">{tx.date}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
