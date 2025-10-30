@@ -7,10 +7,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        'liberty-navy': '#1a2332',
-        'liberty-teal': '#0d9488',
-        'liberty-mint': '#00c48c',
-        'liberty-gold': '#dc8b5e',
+        'liberty-primary': '#1A237E',
+        'liberty-accent': '#00C48C',
+        'liberty-success': '#4CAF50',
+        'liberty-error': '#F44336',
+        'liberty-text-primary': '#FFFFFF',
+        'liberty-text-secondary': '#B0BEC5',
       },
     },
   },
