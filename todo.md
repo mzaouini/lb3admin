@@ -81,3 +81,16 @@
 - [x] Add chip icon (yellow/gold)
 - [x] Add Mastercard logo (red/orange circles)
 - [x] Match exact color scheme from reference
+
+
+## Card Management View Toggle & Enhanced Filters
+- [x] Add icon/grid view vs list/table view toggle
+- [x] List view shows card numbers (last 4 digits)
+- [x] List view shows all card details in table format
+- [x] Toggle button in Card Management header
+- [x] Persist view preference in localStorage
+- [x] Filter by employee/beneficiary name
+- [x] Filter by employee phone number
+- [x] Filter by employee email
+- [x] Filter by employee company
+- [x] Combined search across all employee fields

@@ -14,7 +14,10 @@ import {
   AlertTriangle,
   DollarSign,
   TrendingUp,
-  Activity
+  Activity,
+  Grid3x3,
+  List,
+  MoreVertical
 } from 'lucide-react';
 import { useEmployees } from '../hooks/useEmployees';
 import { useAuth } from '../contexts/AuthContext';
@@ -73,22 +76,46 @@ export default function CardManagement() {
   const [showPinModal, setShowPinModal] = useState(false);
   const [showCardDetails, setShowCardDetails] = useState(false);
   const [showCVV, setShowCVV] = useState(false);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
+    return (localStorage.getItem('cardViewMode') as 'grid' | 'list') || 'grid';
+  });
+
+  // Toggle view mode and persist to localStorage
+  const toggleViewMode = (mode: 'grid' | 'list') => {
+    setViewMode(mode);
+    localStorage.setItem('cardViewMode', mode);
+  };
 
   // Generate mock cards from employees
   const cards = useMemo(() => generateMockCards(employees), [employees]);
 
-  // Filter cards
+  // Create employee lookup map
+  const employeeMap = useMemo(() => {
+    const map = new Map();
+    employees.forEach(emp => map.set(emp.id, emp));
+    return map;
+  }, [employees]);
+
+  // Filter cards with enhanced employee details search
   const filteredCards = useMemo(() => {
     return cards.filter(card => {
-      const matchesSearch = 
+      const employee = employeeMap.get(card.userId);
+      
+      // Enhanced search: card number (full + last 4), cardholder name, employee details
+      const last4Digits = card.cardNumber.slice(-4);
+      const matchesSearch = searchTerm === '' || 
         card.cardHolderName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        card.cardNumber.includes(searchTerm);
+        card.cardNumber.includes(searchTerm) ||
+        last4Digits.includes(searchTerm) ||
+        employee?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        employee?.phone_number?.includes(searchTerm) ||
+        employee?.company?.toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesStatus = statusFilter === 'all' || card.status === statusFilter;
       
       return matchesSearch && matchesStatus;
     });
-  }, [cards, searchTerm, statusFilter]);
+  }, [cards, searchTerm, statusFilter, employeeMap]);
 
   // Statistics
   const stats = useMemo(() => {
@@ -259,7 +286,7 @@ export default function CardManagement() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             <input
               type="text"
-              placeholder="Search by cardholder name or card number..."
+              placeholder="Search by name, card number, email, phone, company..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-liberty-teal focus:border-transparent outline-none"
@@ -276,10 +303,37 @@ export default function CardManagement() {
             <option value="blocked">Blocked</option>
             <option value="pending">Pending</option>
           </select>
+          
+          {/* View Toggle */}
+          <div className="flex items-center gap-1 border border-gray-300 rounded-lg p-1">
+            <button
+              onClick={() => toggleViewMode('grid')}
+              className={`p-2 rounded transition-colors ${
+                viewMode === 'grid'
+                  ? 'bg-liberty-teal text-white'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+              title="Grid View"
+            >
+              <Grid3x3 size={18} />
+            </button>
+            <button
+              onClick={() => toggleViewMode('list')}
+              className={`p-2 rounded transition-colors ${
+                viewMode === 'list'
+                  ? 'bg-liberty-teal text-white'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+              title="List View"
+            >
+              <List size={18} />
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Cards Grid */}
+      {/* Grid View */}
+      {viewMode === 'grid' && (
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
         {filteredCards.map((card) => (
           <div key={card.id} className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
@@ -449,6 +503,152 @@ export default function CardManagement() {
           </div>
         ))}
       </div>
+      )}
+
+      {/* List View */}
+      {viewMode === 'list' && (
+      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Card (Last 4)
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Cardholder
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Employee Details
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Balance
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Monthly Spend
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Expiry
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredCards.map((card) => {
+                const employee = employeeMap.get(card.userId);
+                const last4 = card.cardNumber.slice(-4);
+                
+                return (
+                  <tr key={card.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <CreditCard size={16} className="text-gray-400" />
+                        <span className="font-mono font-semibold text-gray-900">**** {last4}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">{card.cardHolderName}</div>
+                      <div className="text-sm text-gray-500">ID: {card.userId}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-gray-900">{employee?.email || 'N/A'}</div>
+                      <div className="text-sm text-gray-500">{employee?.phone_number || 'N/A'}</div>
+                      {employee?.company && (
+                        <div className="text-xs text-gray-400 mt-1">{employee.company}</div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        {getStatusIcon(card.status)}
+                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(card.status)}`}>
+                          {card.status.toUpperCase()}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-semibold text-liberty-teal">{card.balance.toLocaleString()} Dhs</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{card.monthlySpend.toLocaleString()} Dhs</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{card.expiryDate}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleViewDetails(card)}
+                          className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                          title="View Details"
+                        >
+                          <Eye size={16} />
+                        </button>
+                        
+                        {permissions?.canActivateCard && card.status !== 'blocked' && (
+                          <div className="relative group">
+                            <button
+                              className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                              title="More Actions"
+                            >
+                              <MoreVertical size={16} />
+                            </button>
+                            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 hidden group-hover:block z-10">
+                              {card.status === 'pending' && (
+                                <button
+                                  onClick={() => handleActivateCard(card)}
+                                  className="w-full px-4 py-2 text-left text-sm text-green-700 hover:bg-green-50 flex items-center gap-2"
+                                >
+                                  <CheckCircle size={16} /> Activate
+                                </button>
+                              )}
+                              {card.status === 'active' && (
+                                <button
+                                  onClick={() => handleFreezeCard(card)}
+                                  className="w-full px-4 py-2 text-left text-sm text-blue-700 hover:bg-blue-50 flex items-center gap-2"
+                                >
+                                  <Snowflake size={16} /> Freeze
+                                </button>
+                              )}
+                              {card.status === 'frozen' && (
+                                <button
+                                  onClick={() => handleUnfreezeCard(card)}
+                                  className="w-full px-4 py-2 text-left text-sm text-teal-700 hover:bg-teal-50 flex items-center gap-2"
+                                >
+                                  <Unlock size={16} /> Unfreeze
+                                </button>
+                              )}
+                              <button
+                                onClick={() => handleResetPin(card)}
+                                className="w-full px-4 py-2 text-left text-sm text-purple-700 hover:bg-purple-50 flex items-center gap-2"
+                              >
+                                <RotateCcw size={16} /> Reset PIN
+                              </button>
+                              {permissions?.canBlockCard && (
+                                <button
+                                  onClick={() => handleBlockCard(card)}
+                                  className="w-full px-4 py-2 text-left text-sm text-red-700 hover:bg-red-50 flex items-center gap-2 border-t border-gray-100"
+                                >
+                                  <Ban size={16} /> Block Card
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      )}
 
       {filteredCards.length === 0 && (
         <div className="text-center py-12 bg-white rounded-lg border border-gray-100">
