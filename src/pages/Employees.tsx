@@ -1,20 +1,94 @@
-import { useState } from 'react';
-import { Plus, Search, Download, Upload, Eye, Loader2 } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Plus, Search, Download, Upload, Eye, Loader2, SlidersHorizontal, X } from 'lucide-react';
 import { useEmployees } from '../hooks/useEmployees';
+
+type SortField = 'name' | 'salary' | 'created_at';
+type SortOrder = 'asc' | 'desc';
 
 export default function Employees() {
   const { employees, loading, error } = useEmployees();
   const [searchTerm, setSearchTerm] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
+  
+  // Filters
+  const [companyFilter, setCompanyFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [minSalary, setMinSalary] = useState('');
+  const [maxSalary, setMaxSalary] = useState('');
+  
+  // Sorting
+  const [sortField, setSortField] = useState<SortField>('name');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
 
-  const filteredEmployees = employees.filter(emp =>
-    (emp.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-    (emp.email?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-    (emp.company?.toLowerCase() || '').includes(searchTerm.toLowerCase())
-  );
+  // Get unique companies for filter dropdown
+  const companies = useMemo(() => {
+    const uniqueCompanies = new Set(employees.map(emp => emp.company).filter(Boolean));
+    return Array.from(uniqueCompanies).sort();
+  }, [employees]);
+
+  // Apply filters and sorting
+  const filteredAndSortedEmployees = useMemo(() => {
+    let filtered = employees.filter(emp => {
+      // Search filter
+      const matchesSearch = 
+        (emp.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+        (emp.email?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+        (emp.company?.toLowerCase() || '').includes(searchTerm.toLowerCase());
+      
+      if (!matchesSearch) return false;
+
+      // Company filter
+      if (companyFilter !== 'all' && emp.company !== companyFilter) return false;
+
+      // Status filter
+      if (statusFilter !== 'all' && emp.kyc_status !== statusFilter) return false;
+
+      // Salary range filter
+      if (minSalary && emp.net_salary && emp.net_salary < parseInt(minSalary)) return false;
+      if (maxSalary && emp.net_salary && emp.net_salary > parseInt(maxSalary)) return false;
+
+      return true;
+    });
+
+    // Apply sorting
+    filtered.sort((a, b) => {
+      let aValue: any, bValue: any;
+
+      switch (sortField) {
+        case 'name':
+          aValue = a.name?.toLowerCase() || '';
+          bValue = b.name?.toLowerCase() || '';
+          break;
+        case 'salary':
+          aValue = a.net_salary || 0;
+          bValue = b.net_salary || 0;
+          break;
+        case 'created_at':
+          aValue = new Date(a.created_at).getTime();
+          bValue = new Date(b.created_at).getTime();
+          break;
+      }
+
+      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return filtered;
+  }, [employees, searchTerm, companyFilter, statusFilter, minSalary, maxSalary, sortField, sortOrder]);
 
   const activeEmployees = employees.filter(emp => emp.kyc_status === 'verified').length;
   const totalSalary = employees.reduce((sum, emp) => sum + (emp.net_salary || 0), 0);
   const avgSalary = employees.length > 0 ? Math.round(totalSalary / employees.length) : 0;
+
+  const clearFilters = () => {
+    setCompanyFilter('all');
+    setStatusFilter('all');
+    setMinSalary('');
+    setMaxSalary('');
+  };
+
+  const hasActiveFilters = companyFilter !== 'all' || statusFilter !== 'all' || minSalary || maxSalary;
 
   if (loading) {
     return (
@@ -78,17 +152,164 @@ export default function Employees() {
         </div>
       </div>
 
-      {/* Search Bar */}
-      <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-          <input
-            type="text"
-            placeholder="Search by name, email, or company..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-liberty-teal focus:border-transparent outline-none"
-          />
+      {/* Search and Filters */}
+      <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100 space-y-4">
+        <div className="flex gap-3">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <input
+              type="text"
+              placeholder="Search by name, email, or company..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-liberty-teal focus:border-transparent outline-none"
+            />
+          </div>
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`flex items-center gap-2 px-4 py-2 border rounded-lg transition-colors ${
+              showFilters || hasActiveFilters
+                ? 'bg-liberty-teal text-white border-liberty-teal'
+                : 'border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            <SlidersHorizontal size={18} />
+            <span>Filters</span>
+            {hasActiveFilters && !showFilters && (
+              <span className="bg-white text-liberty-teal rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
+                •
+              </span>
+            )}
+          </button>
+        </div>
+
+        {/* Advanced Filters */}
+        {showFilters && (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Company</label>
+              <select
+                value={companyFilter}
+                onChange={(e) => setCompanyFilter(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-liberty-teal focus:border-transparent outline-none"
+              >
+                <option value="all">All Companies</option>
+                {companies.map(company => (
+                  <option key={company || 'unknown'} value={company || ''}>{company}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-liberty-teal focus:border-transparent outline-none"
+              >
+                <option value="all">All Status</option>
+                <option value="verified">Verified</option>
+                <option value="pending">Pending KYC</option>
+                <option value="in_progress">In Progress</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Min Salary (Dhs)</label>
+              <input
+                type="number"
+                placeholder="0"
+                value={minSalary}
+                onChange={(e) => setMinSalary(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-liberty-teal focus:border-transparent outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Max Salary (Dhs)</label>
+              <input
+                type="number"
+                placeholder="50000"
+                value={maxSalary}
+                onChange={(e) => setMaxSalary(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-liberty-teal focus:border-transparent outline-none"
+              />
+            </div>
+
+            {hasActiveFilters && (
+              <div className="md:col-span-4 flex justify-end">
+                <button
+                  onClick={clearFilters}
+                  className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  <X size={18} />
+                  <span>Clear Filters</span>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Sort Options */}
+        <div className="flex items-center gap-4 pt-4 border-t border-gray-200">
+          <span className="text-sm font-medium text-gray-700">Sort by:</span>
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                if (sortField === 'name') {
+                  setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+                } else {
+                  setSortField('name');
+                  setSortOrder('asc');
+                }
+              }}
+              className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+                sortField === 'name'
+                  ? 'bg-liberty-teal text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Name {sortField === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
+            </button>
+            <button
+              onClick={() => {
+                if (sortField === 'salary') {
+                  setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+                } else {
+                  setSortField('salary');
+                  setSortOrder('desc');
+                }
+              }}
+              className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+                sortField === 'salary'
+                  ? 'bg-liberty-teal text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Salary {sortField === 'salary' && (sortOrder === 'asc' ? '↑' : '↓')}
+            </button>
+            <button
+              onClick={() => {
+                if (sortField === 'created_at') {
+                  setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+                } else {
+                  setSortField('created_at');
+                  setSortOrder('desc');
+                }
+              }}
+              className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+                sortField === 'created_at'
+                  ? 'bg-liberty-teal text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Join Date {sortField === 'created_at' && (sortOrder === 'asc' ? '↑' : '↓')}
+            </button>
+          </div>
+          <span className="text-sm text-gray-500 ml-auto">
+            Showing {filteredAndSortedEmployees.length} of {employees.length} employees
+          </span>
         </div>
       </div>
 
@@ -119,14 +340,14 @@ export default function Employees() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredEmployees.length === 0 ? (
+              {filteredAndSortedEmployees.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                    {searchTerm ? 'No employees found matching your search' : 'No employees yet'}
+                    {searchTerm || hasActiveFilters ? 'No employees found matching your criteria' : 'No employees yet'}
                   </td>
                 </tr>
               ) : (
-                filteredEmployees.map((employee) => (
+                filteredAndSortedEmployees.map((employee) => (
                   <tr key={employee.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
